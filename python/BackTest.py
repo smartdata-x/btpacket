@@ -217,7 +217,7 @@ def get_back_result(uid, token, sonditions, start_time, end_time, pos, count):
     body = ojt.get("body", "")
     bt_session = body.get("bt_session")
     time.sleep(2)
-    ret = result(uid, token, str(bt_session), pos, count)
+    ret = _result(uid, token, str(bt_session), pos, count)
     return ret
   except Exception as er:
     return {};
