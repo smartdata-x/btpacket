@@ -205,32 +205,32 @@ class btpacket:
       for d in stocks:
         s = ""
 
-        stock_info["symbol"]   = d.get("symbol", "")
+        stock_info["symbol"] = d.get("symbol", "")
         s += str(stock_info["symbol"])
         num = 9 - len(str(stock_info["symbol"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["trade"]            = d.get("trade", "")
+        stock_info["trade"] = d.get("trade", "")
         s += str(stock_info["trade"])
         num = 10 - len(str(stock_info["trade"]));
         s += btpacket.__return_blank(self, num)
         
-        stock_info["changepercent"]          = d.get("changepercent", "")
+        stock_info["changepercent"] = d.get("changepercent", "")
         s += str(stock_info["changepercent"])
         num = 16 - len(str(stock_info["changepercent"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["amount"]           = d.get("amount", "")
+        stock_info["amount"] = d.get("amount", "")
         s += str(stock_info["amount"])
         num = 12 - len(str(stock_info["amount"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["volume"]          = d.get("volume", "")
+        stock_info["volume"] = d.get("volume", "")
         s += str(stock_info["volume"])
         num = 14 - len(str(stock_info["volume"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["name"]          = d.get("name", "")
+        stock_info["name"] = d.get("name", "")
         s += str(stock_info["name"])
         
         l_stocks.append(stock_info)
