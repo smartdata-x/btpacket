@@ -25,6 +25,7 @@ class btpacket:
     self.__password = password
     self.__token = ''
     self.__sessionid = ''
+    self.http = 'http://61.147.114.76/cgi-bin/backtest/'
 	
 	
   def __result(self, pos, count):
@@ -36,7 +37,7 @@ class btpacket:
       pos       :起始位置
       count     :个数
     '''
-    url = 'http://61.147.114.87/cgi-bin/backtest/kensho/v1/btresult.fcgi'
+    url = self.http + "kensho/1/btresult.fcgi"
     values = {}
     values['uid'] = self.__uid
     values['token'] = self.__token
@@ -62,7 +63,7 @@ class btpacket:
       end_time   :回测结束时间
       函数功能   :通过回测条件获取sessionid
     '''
-    url = 'http://61.147.114.87/cgi-bin/backtest/kensho/v1/btsentence.fcgi?'
+    url = self.http + "kensho/1/btsentence.fcgi"
     values = {}
     values['uid'] = self.__uid
     values['token'] = self.__token
@@ -98,7 +99,7 @@ class btpacket:
       conditions = btpacket.__replace_chinese_digits(self, conditions)
     # assemble parameters
     values = []
-    search_url = 'http://61.147.114.67/cgi-bin/phbacktest/search/1/btsearch.fcgi'
+    search_url = self.http + "search/1/btsearch.fcgi"
     values.append(search_url)
     values.append('?uid=')
     values.append(str(self.__uid))
@@ -205,32 +206,32 @@ class btpacket:
       for d in stocks:
         s = ""
 
-        stock_info["symbol"] = d.get("symbol", "")
+        stock_info["symbol"]   = d.get("symbol", "")
         s += str(stock_info["symbol"])
         num = 9 - len(str(stock_info["symbol"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["trade"] = d.get("trade", "")
+        stock_info["trade"]            = d.get("trade", "")
         s += str(stock_info["trade"])
         num = 10 - len(str(stock_info["trade"]));
         s += btpacket.__return_blank(self, num)
         
-        stock_info["changepercent"] = d.get("changepercent", "")
+        stock_info["changepercent"]          = d.get("changepercent", "")
         s += str(stock_info["changepercent"])
         num = 16 - len(str(stock_info["changepercent"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["amount"] = d.get("amount", "")
+        stock_info["amount"]           = d.get("amount", "")
         s += str(stock_info["amount"])
         num = 12 - len(str(stock_info["amount"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["volume"] = d.get("volume", "")
+        stock_info["volume"]          = d.get("volume", "")
         s += str(stock_info["volume"])
         num = 14 - len(str(stock_info["volume"]))
         s += btpacket.__return_blank(self, num)
 
-        stock_info["name"] = d.get("name", "")
+        stock_info["name"]          = d.get("name", "")
         s += str(stock_info["name"])
         
         l_stocks.append(stock_info)
@@ -289,6 +290,8 @@ class btpacket:
       prompt = body["prompt"]
     except Exception as e:
       print (str(e))
+      return
+
     if "basic" in prompt:
       benv = prompt["basic"]
     elif "technology" in prompt:
