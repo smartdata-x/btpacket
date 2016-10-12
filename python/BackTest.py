@@ -272,15 +272,87 @@ class btpacket:
 
       self.__uid = int(ojt["user_id"])
       self.__token = ojt["token"]
+      print "登录成功"
+    except Exception as er:
+      print(str(er))
+      print "登录失败"
+
+  def __parse_sentence(self, sen):
+    d = {};
+    for d in sen:
+      sentence = d.get("sentence", "")
+      if sentence != "":
+        print sentence
+    
+
+  def hot_sentence(self, flag, count):
+    '''
+      获取 1：热点事件 2：经典语句 3：推荐语句 4：最新语句 5：最热语句 0：全部
+      flag:值为1，热点事件; 值为2，经典语句; 值为3，推荐语句; 值为4，最新语句; 值为5，最热语句
+      pos:起始位置
+      count:个数
+    ''' 
+    url = self.http + 'hotsuggest/1/hotsuggest.fcgi'
+    values = {}
+    values['uid'] = self.__uid
+    values['token'] = self.__token
+    values['flag'] = flag
+    values['pos'] = 0
+    values['count'] = count
+
+    try:
+      data = urllib.urlencode(values)
+      req = urllib2.Request(url, data)
+      response = urllib2.urlopen(req)
+      the_page = response.read()
+      ojt = json.loads(the_page)
+      ojt = ojt.get("body", "")
+      ojt = ojt.get("sentences", "")
+      
+      one = "";
+      two = "";
+      three = "";
+      four = "";
+      five = "";
+      for d in ojt:
+        one = d.get("1", one)
+        two = d.get("2", two)
+        three = d.get("3", three)
+        four = d.get("4", four)
+        five = d.get("5", five)
+      
+      if one != "":
+        print "start************热点事件*************"
+        btpacket.__parse_sentence(self, one);
+        print "end************热点事件*************\n"
+
+      if two != "":
+        print "start************经典语句*************"
+        btpacket.__parse_sentence(self, two);
+        print "end************热点事件*************\n"
+
+      if three != "":
+        print "start************推荐语句*************"
+        btpacket.__parse_sentence(self, three);
+        print "end************推荐语句*************\n"
+
+      if four != "":
+        print "start************最新语句*************"
+        btpacket.__parse_sentence(self, four);
+        print "end************最新语句*************\n"
+
+      if five != "":
+        print "start************最热语句*************"
+        btpacket.__parse_sentence(self, five);
+        print "end************最热语句*************\n"
 
     except Exception as er:
       print(str(er))
+
 	  
   def search_sentence(self, sonditions):
     '''
       获取符合条件的语句
-      uid       :用户id
-      token     :验证串,可以通过登录接口获得 
       sondition :用户输入语句
     '''
     try:
