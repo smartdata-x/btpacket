@@ -5,6 +5,8 @@ import urllib2
 import json
 import time
 import re
+import crypt
+import hashlib
 import sys
   
 reload(sys)
@@ -54,7 +56,7 @@ class btpacket:
       print(str(er))
       return {}
   
-  def __btcondition(self, sondition, start_time, end_time):
+  def __btcondition(self, sondition, start_time, end_time, base):
     '''
       uid        :用户id
       token      :验证串,可以通过登录接口获得
@@ -70,9 +72,13 @@ class btpacket:
     values['sonditions'] = sondition
     values['start_time'] = start_time
     values['end_time'] = end_time
+    if base == 1:
+      values['base_sessionid'] = self.__sessionid
     try:
       data = urllib.urlencode(values);
       req = urllib2.Request(url, data)
+      print url
+      print data
       response = urllib2.urlopen(req)
       sessionid = response.read()
       return sessionid
@@ -172,17 +178,11 @@ class btpacket:
       函数功能  ：返回原始密码加密后的字符串
       password  ：用户输入的原始密码
     '''
-    url = "http://t.stock.iwookong.com/buildpwd.php"
-    values = {}
-    values["pwd"] = password
     try:
-      data = urllib.urlencode(values)
-      req = urllib2.Request(url, data)
-      response = urllib2.urlopen(req)
-      the_page = response.read()
-      pattern = '.*class="container">(.*)</div'
-      result = re.findall(pattern, the_page)
-      pwd = result[0]  
+      cry = crypt.crypt(password, password[0:2])
+      m = hashlib.md5()
+      m.update(cry)
+      pwd = m.hexdigest()
       return pwd 
     except Exception as er:
       print(str(er))
@@ -198,11 +198,20 @@ class btpacket:
     try:
       ojt = json.loads(stock_json)
       body = ojt.get("body", "")
+      if body == "":
+        return []
       stocks = body.get("stocks", "")
+      if stocks == "":
+        return []
 
       l_stocks = []
       stock_info = {}
-      print "symbol   trade     changepercent   amount      volume        name"
+      
+      if (len(stocks) > 0):
+        print "symbol   trade     changepercent   amount      volume        name         extra_info"
+      else:
+        print "没有数据"
+
       for d in stocks:
         s = ""
 
@@ -233,7 +242,12 @@ class btpacket:
 
         stock_info["name"]          = d.get("name", "")
         s += str(stock_info["name"])
-        
+        num = 17 - len(str(stock_info["name"]))
+        s += btpacket.__return_blank(self, num)
+
+        stock_info["extra_info"] = d.get("extra_info", "")
+        s += str(stock_info["extra_info"])
+         
         l_stocks.append(stock_info)
         
         print s
@@ -379,7 +393,7 @@ class btpacket:
       sen = d["mode_sentence"]
       print sen
   
-  def get_back_result(self, sonditions, start_time, end_time, pos, count, return_choice):
+  def get_back_result(self, sonditions, start_time, end_time, pos, count, return_choice, base):
     '''
       功能:获取回测结果
       sonditions :回测条件
@@ -405,13 +419,32 @@ class btpacket:
         sondition["params"] = d.get("params", "")
         l_condition.append(sondition)
       condition = json.dumps(l_condition)
-      bt = btpacket.__btcondition(self, condition, start_time, end_time)
+      bt = btpacket.__btcondition(self, condition, start_time, end_time, base)
       ojt = json.loads(bt)
       body = ojt.get("body", "")
       bt_session = body.get("bt_session")
       self.__sessionid = str(bt_session);
-      time.sleep(3)
-      ret = btpacket.__result(self, pos, count)
+      print self.__sessionid
+      
+      have_date = 0
+      ret = {}
+      while have_date < 5:
+        time.sleep(3)
+        tmp = btpacket.__result(self, pos, count)
+        ojt = json.loads(tmp)
+        body = ojt["body"]
+        stocks = body.get("stocks", "")
+        size = len(stocks)
+        if (size > 0):
+          ret = tmp
+          have_date = 5
+          break;
+        have_date = have_date + 1
+      
+      if len(ret) == 0:
+        print "没有数据"
+        return ret
+
       if return_choice is 1:
         ret = btpacket.__parse_stock(self, ret)
       else:
