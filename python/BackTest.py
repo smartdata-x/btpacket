@@ -266,7 +266,7 @@ class btpacket:
       password    : 密码
       platform_id : 运营部id标识
     '''
-    url = 'http://61.147.114.76/cgi-bin/twookong122/user/1/user_login.fcgi'
+    url = self.http + 'user/1/user_login.fcgi'
     values = {}
     values['user_name'] = self.__user_name
     password = btpacket.__md5en(self, self.__password)
