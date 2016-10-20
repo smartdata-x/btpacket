@@ -285,9 +285,7 @@ class btpacket:
       ojt = ojt.get("user_info", "")
 
       self.__uid = int(ojt["user_id"])
-      print self.__uid;
       self.__token = ojt["token"]
-      print self.__token;
       print "登录成功"
     except Exception as er:
       print(str(er))
@@ -373,7 +371,6 @@ class btpacket:
     '''
     try:
       sentence = btpacket.__fuzzy_search(self, sonditions)
-      print sentence
       ojt = json.loads(sentence)
       body = ojt["body"]
       prompt = body["prompt"]
