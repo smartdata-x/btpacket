@@ -5,7 +5,7 @@ import urllib2
 import json
 import time
 import re
-import crypt
+import passlib.hash
 import hashlib
 import sys
   
@@ -179,7 +179,7 @@ class btpacket:
       password  ：用户输入的原始密码
     '''
     try:
-      cry = crypt.crypt(password, password[0:2])
+      cry = passlib.hash.des_crypt.encrypt(password, salt=password[0:2])
       m = hashlib.md5()
       m.update(cry)
       pwd = m.hexdigest()
